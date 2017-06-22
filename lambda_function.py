@@ -67,7 +67,7 @@ def create_voice_message(registeredOwner, current_temp, song_title, song_artist)
 	print("Calling Polly with message: ",voiceMessage)
 	pollyVoices = pollyClient.describe_voices(LanguageCode='en-AU')
 	print("pollyVoices: ",pollyVoices)
-	response=pollyClient.synthesize_speech(Text=voiceMessage, VoiceId='Nicole', OutputFormat='mp3')
+	response=pollyClient.synthesize_speech(Text=voiceMessage, VoiceId='Salli', OutputFormat='mp3')
 	print(response)
 	data_stream=response.get("AudioStream")
 	print("data_stream: ",data_stream)
@@ -79,7 +79,8 @@ def create_voice_message(registeredOwner, current_temp, song_title, song_artist)
 		Params={
 			'Bucket': 'daas-polly-files',
 			'Key': filename
-		}
+		},
+		ExpiresIn=300
 	)
 	print("url: ", url)
 	return url
