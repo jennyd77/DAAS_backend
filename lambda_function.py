@@ -19,7 +19,7 @@ def weather_check(latitude, longitude):
     print("Device's reported longitude: ", longitude)
     print("Passing device geo-location to worldweatheronline to see if it is raining")
     #apiurl="http://api.worldweatheronline.com/premium/v1/weather.ashx?key=d4dab5e2738542f884000750172904&q=%s,%s&num_of_days=1&format=json&localObsTime=yes" % (latitude,longitude)
-    apiurl="http://api.worldweatheronline.com/premium/v1/weather.ashx?key=4d8f5ad3106b492ba1323348172206&q=%s,%s&num_of_days=1&format=json&localObsTime=yes" % (latitude,longitude)
+    apiurl='http://api.worldweatheronline.com/premium/v1/weather.ashx?key=4d8f5ad3106b492ba1323348172206&q=%s,%s&num_of_days=1&format=json&localObsTime=yes' % (latitude,longitude)
     print("Making HTTP GET request to the following url: ", apiurl)
     response=requests.get(apiurl)
     try:
@@ -80,7 +80,7 @@ def create_voice_message(registeredOwner, current_temp, song_title, song_artist)
 			'Bucket': 'daas-polly-files',
 			'Key': filename
 		},
-		ExpiresIn=300
+		ExpiresIn=30000
 	)
 	print("url: ", url)
 	return url
@@ -115,14 +115,14 @@ def lambda_handler(event, context):
         else:
             song = which_song_to_play()            
         print("song: ", song)
-        payload = {'state':{'desired':{'playbackStart': 'True', 'song': {'mark_in': '01', 'song_name': 'Im so excited', 'artist': 'Pointer Sisters', 'title': 'im_so_excited'}, 'url': 'http:\\blah_blah.com'}}}
+        payload = {'state':{'desired':{'playbackStart': 'True', 'volume': 1.0, 'duration': 30, 'song': {'mark_in': '01', 'song_name': 'Im so excited', 'artist': 'Pointer Sisters', 'title': 'im_so_excited'}, 'url': 'http:\\blah_blah.com'}}}
         payload["state"]["desired"]["song"]=song
+        voicemessageurl = create_voice_message(registeredOwner, current_temp, song['song_name'], song['artist'])
+        payload["state"]["desired"]["url"]=voicemessageurl
         json_message = json.dumps(payload)
         print("json_message: ", json_message)
         response = client.update_thing_shadow(thingName = "DiscoMaster2000", payload = json_message)
         print("response: ", response)
-        voicemessageurl = create_voice_message(registeredOwner, current_temp, song['song_name'], song['artist'])
-        payload["state"]["desired"]["url"]=voicemessageurl
         print("return payload: ", payload)
     else:
         print("The door is closed")
