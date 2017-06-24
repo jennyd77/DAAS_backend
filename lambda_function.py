@@ -67,6 +67,7 @@ def time_check(latitude, longitude):
         local_time_now = utc_time_now + timedelta(seconds=utc_offset)
         print("local_time_now: ", local_time_now)
         print("hour: ", local_time_now.hour)
+        print("hour as int: ", int(local_time_now.hour))
         if int(local_time_now.hour) > 19:
             print("Kids are in bed. Play disco at low volume")
         else:
