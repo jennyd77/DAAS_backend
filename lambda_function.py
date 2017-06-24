@@ -7,7 +7,6 @@ from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 import time
-#from time import gmtime
 
 client = boto3.client('iot-data', region_name = 'ap-southeast-2')
 dynamodb = boto3.resource('dynamodb', region_name='ap-southeast-2')
@@ -164,9 +163,7 @@ def lambda_handler(event, context):
         # Using the received latitude and longitude, determine local time
         time_volume=time_check(latitude, longitude)
         time_at_disco=time_volume["local_time_str"]
-        print("Main, time_at_disco: ",time_at_disco)
         volume=time_volume["volume"]
-        print("Main, volume: ",volume)
         payload = {'state':{'desired':{'playbackStart': 'True', 'volume': 1.0, 'duration': 5, 'song': {'mark_in': '01', 'song_name': 'Im so excited', 'artist': 'Pointer Sisters', 'title': 'im_so_excited'}, 'url': 'http:\\blah_blah.com'}}}
         payload["state"]["desired"]["song"]=song
         voicemessageurl = create_voice_message(registeredOwner, current_temp, song['song_name'], song['artist'], time_at_disco)
