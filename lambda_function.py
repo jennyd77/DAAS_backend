@@ -67,18 +67,19 @@ def time_check(latitude, longitude):
         local_time_now = utc_time_now + timedelta(seconds=utc_offset)
         print("local_time_now: ", local_time_now)
         print("hour: ", local_time_now.hour)
-        print("hour as int: ", int(local_time_now.hour))
         if int(local_time_now.hour) > 19:
             print("Kids are in bed. Play disco at low volume")
+            volume=0.5
         else:
             print("It's daytime. Play disco at full volume")
+            volume=1.0
         print("string datetime: ", str(local_time_now))
         local_time_str=local_time_now.strftime('%I:%M%p')
     else:
         local_time_str = "unknown"    
         print("No results from Google Maps")
 
-    return local_time_str
+    return {'local_time_str':local_time_str, 'volume':volume}
 
 def get_registered_owner(macAddress):
     try:
@@ -161,11 +162,16 @@ def lambda_handler(event, context):
         print("song: ", song)
 
         # Using the received latitude and longitude, determine local time
-        time_str=time_check(latitude, longitude)
+        time_volume=time_check(latitude, longitude)
+        time_at_disco=time_volume["local_time_str"]
+        print("Main, time_at_disco: ",time_at_disco)
+        volume=time_volume["volume"]
+        print("Main, volume: ",volume)
         payload = {'state':{'desired':{'playbackStart': 'True', 'volume': 1.0, 'duration': 5, 'song': {'mark_in': '01', 'song_name': 'Im so excited', 'artist': 'Pointer Sisters', 'title': 'im_so_excited'}, 'url': 'http:\\blah_blah.com'}}}
         payload["state"]["desired"]["song"]=song
-        voicemessageurl = create_voice_message(registeredOwner, current_temp, song['song_name'], song['artist'], time_str)
+        voicemessageurl = create_voice_message(registeredOwner, current_temp, song['song_name'], song['artist'], time_at_disco)
         payload["state"]["desired"]["url"]=voicemessageurl
+        payload["state"]["desired"]["volume"]=float(volume)
         json_message = json.dumps(payload)
         print("json_message: ", json_message)
         response = client.update_thing_shadow(thingName = "DiscoMaster2000", payload = json_message)
