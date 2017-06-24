@@ -58,16 +58,19 @@ def time_check(latitude, longitude):
         print("Unsuccessful call to Google Maps Time Zone API")
     print("Full response from Google Maps Timezone API: ", json_timezone)
     if json_timezone["status"]=="OK":
+        # Calculate the local time at the provided geo-coordinates
         print("Received results from Google Maps")
-        base_offset = json_timezone["rawOffset"]
-        dst_offset = json_timezone["dstOffset"]
-        utc_offset = base_offset+dst_offset
+        utc_offset = json_timezone["rawOffset"]+json_timezone["dstOffset"]
         print("utc_offset: ",utc_offset)
         utc_time_now=datetime.utcnow()
         print("utc_time_now: ", utc_time_now)
         local_time_now = utc_time_now + timedelta(seconds=utc_offset)
         print("local_time_now: ", local_time_now)
         print("hour: ", local_time_now.hour)
+        if int(local_time_now.hour) > 19:
+            print("Kids are in bed. Play disco at low volume")
+        else
+            print("It's daytime. Play disco at full volume")
         print("string datetime: ", str(local_time_now))
         local_time_str=local_time_now.strftime('%I:%M%p')
     else:
